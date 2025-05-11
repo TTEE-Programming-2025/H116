@@ -223,6 +223,42 @@ void arrangeForYou() {
     printf("無法找到合適的座位安排。\n");
 }
 
+// 手動選擇座位
+void chooseSeats() {
+    int row, col;
+    char input[10];
+    char ans;
+
+    while (1) {
+        printf("請輸入您想選擇的座位(格式為 '列-行', 例如 1-2)：\n");
+        printf("輸入 'q' 返回主選單。\n");
+        
+        // 讀取使用者輸入
+        fgets(input, sizeof(input), stdin);
+        
+        // 如果用戶選擇返回
+        if (input[0] == 'q') {
+            return;
+        }
+
+        // 驗證座位格式
+        if (sscanf(input, "%d-%d", &row, &col) != 2 || row < 1 || row > SIZE || col < 1 || col > SIZE) {
+            printf("無效的輸入，請重新輸入正確格式的座位，如 1-2。\n");
+            continue;
+        }
+
+        // 檢查該座位是否已被預約
+        if (seats[row - 1][col - 1] == '*') {
+            printf("該座位已被預約，請選擇其他座位。\n");
+        } else {
+            seats[row - 1][col - 1] = '*';
+            printf("成功預約座位 %d-%d。\n", row, col);
+            showSeats();
+            return;
+        }
+    }
+}
+
 int main() {
     char choice;
 
@@ -238,6 +274,7 @@ int main() {
         printf("\n=== 座位預約系統 ===\n");
         printf("a. 顯示所有座位\n");
         printf("b. 自動安排座位\n");
+        printf("c. 手動選擇座位\n");
         printf("d. 離開\n");
         printf("請選擇：");
         scanf(" %c", &choice);
@@ -248,6 +285,9 @@ int main() {
                 break;
             case 'b':
                 arrangeForYou(); // 安排座位
+                break;
+            case 'c':
+                chooseSeats(); // 手動選擇座位
                 break;
             case 'd':
                 printf("系統結束，再見。\n");
