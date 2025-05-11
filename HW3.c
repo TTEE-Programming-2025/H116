@@ -104,8 +104,10 @@ void arrangeForYou() {
     char ans;
     
     printf("請輸入要安排幾個座位（1~4）：");
-    scanf("%d", &n);
-
+    while (scanf("%d", &n) != 1 || n < 1 || n > 4) {
+    printf("輸入錯誤，請輸入1~4之間的數字：");
+    while(getchar() != '\n'); // 清除緩衝區
+}
     if (n < 1 || n > 4) {
         printf("輸入錯誤，請輸入1~4之間的數字。\n");
         return;
@@ -210,6 +212,9 @@ void arrangeForYou() {
                     seats[row][col] = '*';
                     seats[row + 1][col] = '*';
                     clearScreen(); // 顯示完畢後清除螢幕並回到主選單
+                    printf("座位選擇完成，按任意鍵返回主選單...\n");
+                    getchar();  // 等待用戶按任意鍵
+                    clearScreen();
                     return;
                 } else {
                     seats[row][col] = '-';
