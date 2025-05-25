@@ -49,7 +49,7 @@ int input_int_in_range(int min, int max) {
 
 // 輸所有學生資料
 void input_student_data() {
-    int i;  // 迴圈變數改宣告在外面
+    int i; // 將變數宣告移出for迴圈
     CLEAR_SCREEN();
     printf("請輸入學生人數 (%d ~ %d)：", MIN_STUDENTS, MAX_STUDENTS);
     n = input_int_in_range(MIN_STUDENTS, MAX_STUDENTS);
@@ -86,7 +86,7 @@ void input_student_data() {
 
 // 所有學生資料
 void display_students() {
-    int i;  // 迴圈變數改宣告在外面
+    int i; // 宣告迴圈變數
     CLEAR_SCREEN();
     if(n == 0) {
         printf("目前沒有學生資料！\n");
@@ -105,7 +105,7 @@ void display_students() {
 
 // 輸入姓名，找到顯示資料，找不到顯示提示
 void search_student() {
-    int i;  // 迴圈變數改宣告在外面
+    int i; // 宣告迴圈變數
     char search_name[50];
     int found = 0;
     CLEAR_SCREEN();
@@ -143,7 +143,7 @@ int compare_avg_desc(const void *a, const void *b) {
 
 // 6. 輸出成績排名，只顯示姓名、學號、平均成績，依平均成績由高到低排列
 void grade_ranking() {
-    int i;  // 迴圈變數改宣告在外面
+    int i; // 宣告迴圈變數
     CLEAR_SCREEN();
     if(n == 0) {
         printf("目前沒有學生資料！\n");
@@ -170,6 +170,8 @@ int main() {
     const char correct_password[] = "2025"; 
     char input_pwd[10];
     int tries = 0;
+    int i; // 迴圈變數，如有需要可用
+
     
     while(tries < 3) {
         CLEAR_SCREEN();
@@ -209,9 +211,20 @@ int main() {
             case 'b': display_students(); break;
             case 'c': search_student(); break;
             case 'd': grade_ranking(); break;
-            case 'e': 
-                printf("系統結束，再見！\n");
-                return 0;
+            case 'e': {
+                char confirm;
+                do {
+                    printf("確定離開？ (y/n): ");
+                    confirm = getchar();
+                    while(getchar() != '\n'); 
+                } while(confirm != 'y' && confirm != 'n');
+                if(confirm == 'y') {
+                    printf("系統結束，再見！\n");
+                    return 0;
+                }
+                // 如果是 'n' 就繼續迴圈回主選單
+                break;
+            }
             default:
                 printf("輸入錯誤，請重新輸入！\n");
                 pause();
