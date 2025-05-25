@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <ctype.h>  // isdigit()
 
 #ifdef _WIN32
 #define CLEAR_SCREEN() system("cls")
@@ -21,6 +22,16 @@ typedef struct {
 
 Student students[MAX_STUDENTS]; // 儲存學生
 int n = 0; // 實學生人數
+
+// 判斷字串是否全為數字
+int is_numeric(const char *str) {
+    int i;
+    for (i = 0; str[i] != 0; i++) {
+        if (!isdigit((unsigned char)str[i]))
+            return 0;
+    }
+    return 1;
+}
 
 // 暫停
 void pause() {
@@ -49,23 +60,23 @@ int input_int_in_range(int min, int max) {
 
 // 輸所有學生資料
 void input_student_data() {
-    int i; // 將變數宣告移出for迴圈
     CLEAR_SCREEN();
     printf("請輸入學生人數 (%d ~ %d)：", MIN_STUDENTS, MAX_STUDENTS);
     n = input_int_in_range(MIN_STUDENTS, MAX_STUDENTS);
 
+    int i;
     for(i = 0; i < n; i++) {
         printf("第 %d 位學生姓名：", i+1);
         fgets(students[i].name, sizeof(students[i].name), stdin);
         students[i].name[strcspn(students[i].name, "\n")] = 0; 
 
-        // 輸入並檢查學號長度是否為6位數
+        // 輸入並檢查學號長度及是否全數字
         while(1) {
             printf("第 %d 位學生學號 (6 位數)：", i+1);
             fgets(students[i].id, sizeof(students[i].id), stdin);
             students[i].id[strcspn(students[i].id, "\n")] = 0;
-            if(strlen(students[i].id) == 6) break;
-            printf("學號格式錯誤，請輸入 6 位數！\n");
+            if(strlen(students[i].id) == 6 && is_numeric(students[i].id)) break;
+            printf("學號格式錯誤，請輸入 6 位數字！\n");
         }
 
         // 分別輸入三科成績，範圍0~100
@@ -86,11 +97,11 @@ void input_student_data() {
 
 // 所有學生資料
 void display_students() {
-    int i; // 宣告迴圈變數
     CLEAR_SCREEN();
     if(n == 0) {
         printf("目前沒有學生資料！\n");
     } else {
+        int i;
         printf("姓名\t學號\t數學\t物理\t英文\t平均\n");
         for(i = 0; i < n; i++) {
             printf("%s\t%s\t%d\t%d\t%d\t%.1f\n",
@@ -105,7 +116,6 @@ void display_students() {
 
 // 輸入姓名，找到顯示資料，找不到顯示提示
 void search_student() {
-    int i; // 宣告迴圈變數
     char search_name[50];
     int found = 0;
     CLEAR_SCREEN();
@@ -113,6 +123,7 @@ void search_student() {
     fgets(search_name, sizeof(search_name), stdin);
     search_name[strcspn(search_name, "\n")] = 0; 
 
+    int i;
     for(i = 0; i < n; i++) {
         if(strcmp(students[i].name, search_name) == 0) {
             found = 1;
@@ -143,7 +154,6 @@ int compare_avg_desc(const void *a, const void *b) {
 
 // 6. 輸出成績排名，只顯示姓名、學號、平均成績，依平均成績由高到低排列
 void grade_ranking() {
-    int i; // 宣告迴圈變數
     CLEAR_SCREEN();
     if(n == 0) {
         printf("目前沒有學生資料！\n");
@@ -154,10 +164,12 @@ void grade_ranking() {
     
     Student sorted[MAX_STUDENTS];
     memcpy(sorted, students, sizeof(Student)*n);
+
     qsort(sorted, n, sizeof(Student), compare_avg_desc);
 
     printf("成績排名（依平均成績由高到低）：\n");
     printf("名次\t姓名\t學號\t平均\n");  
+    int i;
     for(i = 0; i < n; i++) {
         printf("%d\t%s\t%s\t%.1f\n",
             i+1, sorted[i].name, sorted[i].id, sorted[i].avg);
@@ -170,9 +182,7 @@ int main() {
     const char correct_password[] = "2025"; 
     char input_pwd[10];
     int tries = 0;
-    int i; // 迴圈變數，如有需要可用
 
-    
     while(tries < 3) {
         CLEAR_SCREEN();
         printf("歡迎使用成績系統，請輸入4位數密碼(2025)：");
@@ -213,16 +223,19 @@ int main() {
             case 'd': grade_ranking(); break;
             case 'e': {
                 char confirm;
-                do {
-                    printf("確定離開？ (y/n): ");
+                while(1) {
+                    printf("確定離開？ (y/n)：");
                     confirm = getchar();
-                    while(getchar() != '\n'); 
-                } while(confirm != 'y' && confirm != 'n');
-                if(confirm == 'y') {
-                    printf("系統結束，再見！\n");
-                    return 0;
+                    while(getchar() != '\n');
+                    if(confirm == 'y' || confirm == 'Y') {
+                        printf("系統結束，再見！\n");
+                        return 0;
+                    } else if(confirm == 'n' || confirm == 'N') {
+                        break;
+                    } else {
+                        printf("輸入錯誤，請輸入 y 或 n。\n");
+                    }
                 }
-                // 如果是 'n' 就繼續迴圈回主選單
                 break;
             }
             default:
